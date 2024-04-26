@@ -9,6 +9,9 @@ import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 3. You might have more than one copy of React in the same app
 See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem., js engine: hermes
 */
+
+// now im here
+
 const handlePress = () => {
   const videoRef = useRef(null);
 
