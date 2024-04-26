@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 //import { RNCamera } from 'react-native-camera';
-import { ViewPropTypes } from 'deprecated-react-native-prop-types';
 
 
 import handlePress from './handlePress';
