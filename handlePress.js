@@ -1,18 +1,22 @@
+<<<<<<< HEAD
 import { useRef, useEffect } from 'react';
 
 const useCamera = () => {
   const videoRef = useRef(null);
+=======
+import React, { useEffect } from 'react';
+import { Camera } from 'expo-camera';
+import { View, Text } from 'react-native';
+>>>>>>> 006ec6ef96d1a6ca3a0e6ed74d5d4eff2471a510
 
+const CameraApp = () => {
   useEffect(() => {
-    const openCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
+    (async () => {
+      const { status } = await Camera.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission to access camera was denied');
       }
+<<<<<<< HEAD
     };
 
     openCamera();
@@ -30,3 +34,16 @@ const useCamera = () => {
 };
 
 export default useCamera;
+=======
+    })();
+  }, []);
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Camera style={{ flex: 1 }} type={Camera.Constants.Type.back} />
+    </View>
+  );
+};
+
+export default CameraApp;
+>>>>>>> 006ec6ef96d1a6ca3a0e6ed74d5d4eff2471a510
