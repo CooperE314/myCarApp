@@ -26,7 +26,8 @@
           "recordAudioAndroid": true
         }
       ]
-    ],
+    ]
+    ,
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
