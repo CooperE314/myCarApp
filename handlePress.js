@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { Camera } from 'expo-camera';
 import { View, Text } from 'react-native';
@@ -9,6 +10,7 @@ const CameraApp = () => {
       if (status !== 'granted') {
         alert('Permission to access camera was denied');
       }
+
     })();
   }, []);
 
@@ -20,3 +22,5 @@ const CameraApp = () => {
 };
 
 export default CameraApp;
+
+
