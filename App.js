@@ -1,56 +1,72 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
-//import { RNCamera } from 'react-native-camera';
+import { Camera, CameraType } from 'expo-camera';
+import { useState } from 'react';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+export default function App() {
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View />;
+  }
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center' }}>
+          We need your permission to show the camera
+        </Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
+  }
 
 
-import handlePress from './handlePress';
+  function toggleCameraType() {
+    setType((current) => (
+      current === CameraType.back ? CameraType.front : CameraType.back
+    ));
+  }
 
-function App(){
   return (
     <View style={styles.container}>
-      <Text style={styles.appTitle}>The Car App</Text>
-      <TouchableOpacity style={styles.buttonContainer} onPress={handlePress}>
-        <Image 
-        source={require('./pics/camera2.png')}
-        style = {styles.buttonImage}
-        />
-      </TouchableOpacity>
+      <Camera style={styles.camera} type={type}>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={toggleCameraType}>
+            <Text style={styles.text}>Flip Camera</Text>
+          </TouchableOpacity>
+        </View>
+      </Camera>
     </View>
   );
-  
 }
-export default App;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'blue',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 150,
-  },
-  appTitle: {
-    fontSize: 36,
-    color: 'white',
-    marginBottom: 150,
-  },
-  buttonContainer: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'gray',
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 18,
-    color: 'white',
-  },
-  buttonImage: {
-    width: 100, 
-    height: 100,
   },
   camera: {
     flex: 1,
-    width: '100%',
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: 'transparent',
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
