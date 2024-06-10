@@ -2,105 +2,22 @@ import { Camera, CameraType } from 'expo-camera';
 import React, { useRef, useState } from 'react';
 import { Button, Image, StyleSheet, Text, TouchableOpacity, View, State } from 'react-native';
 import {GestureHandlerRootView , PanGestureHandler} from 'react-native-gesture-handler';
-import {Animated} from 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
 export default function App() {
-  const [type, setType] = useState(Camera.Constants.Type.back);
-  const [permission, requestPermission] = Camera.useCameraPermissions();
-  const cameraRef = useRef(null);
-  const [photoUri, setPhotoUri] = useState(null);
-
-
-  if (!permission) {
-        // Camera permissions are still loading
-
-    return <View />;
-  }
   
-  if (!permission.granted) {
-        // Camera permissions are not granted yet
-
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>
-          We need your permission to show the camera
-        </Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
-  }
-  function toggleCameraType() {
-      //flip camera function
-
-    setType((current) => (
-      current === CameraType.back ? CameraType.front : CameraType.back
-    ));
-  }
-  const takePicture = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      setPhotoUri(photo.uri);
-      console.log(photo);
-    }
-  };
-
   return(
     <NavigationContainer>
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="CameraScreen">
-        {props => (
-          <GestureHandlerRootView style={styles.container}>          
-              <PanGestureHandler
-                onGestureEvent={({ nativeEvent }) => { 
-                  if (nativeEvent.translationX < -50) {
-                    props.navigation.navigate('HistoryScreen');
-                  }
-                }}
-              >
-                <Camera
-                  style={styles.camera}
-                  type={type}
-                  ref={cameraRef}
-                >
-                  <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                      style={styles.button}
-                      onPress={takePicture}
-                    >
-                      <Text style={styles.text}>Take Picture</Text>
-                    </TouchableOpacity>
-                  </View>
-                </Camera>
-              </PanGestureHandler>
-          </GestureHandlerRootView>
-        )}
-      </Stack.Screen>
+    <Stack.Navigator screenOptions={{ headerShown: false}}>
+      <Stack.Screen name="CameraScreen" component={CameraScreen} />
       <Stack.Screen name="HistoryScreen" component={HistoryScreen} />
       <Stack.Screen name="PictureScreen" component={PictureScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
-}
-const HistoryScreen = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}></View>
-  );
-
-}
-const PictureScreen = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}></View>
-  );
-}
-const CameraScreen = () => {
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}></View>
-  );
-
 }
 const styles = StyleSheet.create({
   container: {
@@ -116,18 +33,124 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     margin: 64,
   },
-  button: {
+  PictureButton: {
     flex: 1,
     alignSelf: 'flex-end',
     alignItems: 'center',
+    bottom: 50,
   },
   text: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
   },
+  image: {
+    width: '70%', 
+    height: '70%', 
+    resizeMode: 'contain',
+    transform: [{ scale: 0.9 }],
+    borderWidth: 5,
+    borderColor: 'black',
+  },
   photo: {
     flex: 1,
     resizeMode: 'contain',
   },
+  imageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    bottom: 50,
+  },
+  PictureScreenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'blue',
+  },
+  PictureScreenText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
+    textAlign: 'center',
+    bottom: 190,
+  }
 });
+const HistoryScreen = () => {
+  return (
+    <View style={{ flex: 1, backgroundColor: 'white' }}></View>
+  );
+
+}
+const PictureScreen = ({route}) => {
+  const { photoUri } = route.params;
+
+  return (
+    <View style={styles.PictureScreenContainer}>
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: photoUri }} style={styles.image} />
+      </View>
+      <Text style={styles.PictureScreenText}>COOL PICTURE</Text>
+    </View>
+  );
+}
+const CameraScreen = (props) => {
+  const [type, setType] = useState(Camera.Constants.Type.back);
+  const cameraRef = useRef(null);
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [photoUri, setPhotoUri] = useState(null);
+  if (!permission) {
+    // Camera permissions are still loading
+    return <View />;
+  }
+  if (!permission.granted) {
+    // Camera permissions are not granted yet
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: 'center' }}>
+          We need your permission to show the camera
+        </Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
+  }
+  
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync();
+      setPhotoUri(photo.uri);
+      props.navigation.navigate('PictureScreen', { photoUri: photo.uri });
+
+    }
+  };
+
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      <PanGestureHandler
+        onGestureEvent={({ nativeEvent }) => {
+          if (nativeEvent.translationX < -50) {
+            props.navigation.navigate('HistoryScreen');
+          }
+        }}
+      >
+        <Camera
+          style={styles.camera}
+          type={type}
+          ref={cameraRef}
+          autoFocus={Camera.Constants.AutoFocus.on}
+
+          >
+            <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.PictureButton}
+              onPress={() => {
+                takePicture(); 
+              }}
+              >
+                <Image source={require('./assets/camera2.png')} style={{ width: 90, height: 90 }} />
+              </TouchableOpacity>
+            </View>
+        </Camera>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
+  );
+};
